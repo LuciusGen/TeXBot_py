@@ -1,1 +1,1 @@
-pyTelegramBotApi==3.6.6
+pyTelegramBotApi==3.6.7
