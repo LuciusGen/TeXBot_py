@@ -15,4 +15,4 @@ def start_message(message):
     bot.send_message(message.chat.id, Answers.start_ans, reply_markup=Answers.main_markup, parse_mode='markdown')
 
 
-bot.polling(none_stop=False, interval=100, timeout=20)
+bot.polling(none_stop=False, interval=1, timeout=20)
