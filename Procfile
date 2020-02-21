@@ -1,1 +1,1 @@
-web: python LaTex_bot.py $PORT
+worker: python LaTex_bot.py
