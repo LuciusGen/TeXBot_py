@@ -7,6 +7,7 @@ from mth import Math
 from telebot import types
 
 url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
+url_team_leader = 'https://t.me/dont_open'
 bot_token = Config.get_token()
 
 bot = telebot.TeleBot(bot_token)
@@ -23,6 +24,8 @@ def send_text(message):
         bot.send_message(message.chat.id, Math.math_ans, reply_markup=mth.start_kb_for_high_school())
     elif message.text == '💰Помощь проекту':
         bot.send_message(message.chat.id, url_donate_path)
+    elif message.text == '☝️Рекомендации':
+        bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + url_team_leader)
     else:
         bot.send_message(message.chat.id, "Данная фича в разработке, пожалуйста, выберите другую кнопу.")
 
