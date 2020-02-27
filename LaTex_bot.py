@@ -26,7 +26,7 @@ def send_text(message):
     if message.text == '💰Помощь проекту':
         bot.send_message(message.chat.id, url_donate_path)
 
-    if message.text == '☝️Рекомендации':
+    if message.text == '☝Рекомендации':
         bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + url_team_leader)
 
 
