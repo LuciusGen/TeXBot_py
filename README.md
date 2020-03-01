@@ -27,3 +27,4 @@
 https://habr.com/ru/post/106912/
 # Принятый стиль кодирования
 https://www.python.org/dev/peps/pep-0008/
+</br>
