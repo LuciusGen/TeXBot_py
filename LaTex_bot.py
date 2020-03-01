@@ -44,6 +44,11 @@ def send_text(message):
     if message.text == '☝Рекомендации':
         bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + url_team_leader)
 
+    if message.text == '❔Справка':
+        bot.send_message(message.chat.id, "/tex <формула> - конвертирует <формула> в картинку с ней. "
+                                          "Для выбора тем по высшей математике "
+                                          "последовательно переходите по кнопкам")
+
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('section'))
 def query_handler(call):
