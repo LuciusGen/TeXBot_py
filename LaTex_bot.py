@@ -8,7 +8,6 @@ from conf import Config
 from ans import Answers
 from mth import Math
 
-
 url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
 url_team_leader = 'https://t.me/dont_open'
 bot_token = Config.get_token()
@@ -26,7 +25,7 @@ def convert_latex(message):
     regex = r"^\/tex (.+)"
     parser = re.search(regex, message.text)
     tex_command = parser.group(1)
-    
+
     # Заглушка. Убрать, когда сделаем генерацию картинки
     bot.send_message(message.chat.id,
                      "Вы ввели команду *\"" + tex_command + "\"*. Вскоре я научусь переводить её в картинку!",
@@ -53,7 +52,7 @@ def send_text(message):
 @bot.callback_query_handler(func=lambda call: call.data.endswith('section'))
 def query_handler(call):
     kb = types.InlineKeyboardMarkup()
-    data = call.data[:-7]
+    data = call.data[:-len('section')]
     if data == Math.matan:
         kb = mth.kb_for_matan()
 
@@ -63,9 +62,17 @@ def query_handler(call):
     elif data == Math.geom:
         kb = mth.kb_for_geom()
 
-    bot.send_message(call.message.chat.id,
-                     "Вы выбрали раздел: " + data + "\nТеперь выберите тему.", reply_markup=kb
-                     )
+    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
+                          text="Вы выбрали раздел: " + data + "\nТеперь выберите тему.")
+
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith("back to sections"))
+def query_handler(call):
+    data = call.data[:-len('back to sections')]
+    if data == Answers.back:
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              reply_markup=mth.start_kb_for_high_school(),
+                              text=Math.math_ans)
 
 
 bot.polling(none_stop=False, interval=1, timeout=20)

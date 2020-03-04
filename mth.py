@@ -9,9 +9,11 @@ def kb_for_matan():
                                                  callback_data=Math.integral)
     diff_button = types.InlineKeyboardButton(Math.diff,
                                              callback_data=Math.diff)
+    back_button = types.InlineKeyboardButton("🔥 " + ans.Answers.back,
+                                             callback_data=ans.Answers.back + "back to sections")
 
     matan_markup = types.InlineKeyboardMarkup(row_width=1)
-    matan_markup.add(lim_button, diff_button, integral_button)
+    matan_markup.add(lim_button, diff_button, integral_button, back_button)
 
     return matan_markup
 
@@ -23,9 +25,11 @@ def kb_for_linal():
                                                     callback_data=Math.determinant)
     clay_button = types.InlineKeyboardButton(Math.clay,
                                              callback_data=Math.clay)
+    back_button = types.InlineKeyboardButton("🔥 " + ans.Answers.back,
+                                             callback_data=ans.Answers.back + "back to sections")
 
     linal_markup = types.InlineKeyboardMarkup(row_width=1)
-    linal_markup.add(matrix_button, determinant_button, clay_button)
+    linal_markup.add(matrix_button, determinant_button, clay_button, back_button)
 
     return linal_markup
 
@@ -37,9 +41,11 @@ def kb_for_geom():
                                               callback_data=Math.plane)
     curves_button = types.InlineKeyboardButton(Math.curves,
                                                callback_data=Math.curves)
+    back_button = types.InlineKeyboardButton("🔥 " + ans.Answers.back,
+                                             callback_data=ans.Answers.back + "back to sections")
 
     geom_markup = types.InlineKeyboardMarkup(row_width=1)
-    geom_markup.add(scalar_button, plane_button, curves_button)
+    geom_markup.add(scalar_button, plane_button, curves_button, back_button)
 
     return geom_markup
 
@@ -47,11 +53,11 @@ def kb_for_geom():
 def start_kb_for_high_school():
     # section - отвечает за кнопку "раздел"
 
-    sect_1_button = types.InlineKeyboardButton(Math.matan,
+    sect_1_button = types.InlineKeyboardButton("📈 " + Math.matan,
                                                callback_data=Math.matan + "section")
-    sect_2_button = types.InlineKeyboardButton(Math.linal,
+    sect_2_button = types.InlineKeyboardButton("📓 " + Math.linal,
                                                callback_data=Math.linal + "section")
-    sect_3_button = types.InlineKeyboardButton(Math.geom,
+    sect_3_button = types.InlineKeyboardButton("📐 " + Math.geom,
                                                callback_data=Math.geom + "section")
 
     math_mark = types.InlineKeyboardMarkup(row_width=1)
