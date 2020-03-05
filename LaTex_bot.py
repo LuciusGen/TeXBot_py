@@ -49,21 +49,24 @@ def send_text(message):
                                           "последовательно переходите по кнопкам")
 
 
-@bot.callback_query_handler(func=lambda call: call.data.endswith('section'))
+def is_section(data):
+    if "section" in data.split('.'):
+        return True
+    return False
+    
+
+@bot.callback_query_handler(func=lambda call: is_section(call.data))
 def query_handler(call):
     kb = types.InlineKeyboardMarkup()
-    data = call.data[:-len('section')]
-    if data == Math.matan:
-        kb = mth.kb_for_matan()
+    data = call.data.split('.')
+    topic = data[0]
+    page = data[-1]
 
-    elif data == Math.linal:
-        kb = mth.kb_for_linal()
-
-    elif data == Math.geom:
-        kb = mth.kb_for_geom()
+    if topic+"." in [Math.matan, Math.linal, Math.geom]:
+        kb = mth.generate_paged_list(topic+".", int(page))
 
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
-                          text="Вы выбрали раздел: " + data + "\nТеперь выберите тему.")
+                          text="Вы выбрали раздел: " + topic + "\nТеперь выберите тему.")
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith("back to sections"))
