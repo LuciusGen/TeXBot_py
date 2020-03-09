@@ -2,6 +2,7 @@ from telebot import types
 import ans
 from math import ceil
 
+
 def generate_paged_list(topic, page):
 
     # numb of sections per page
@@ -14,7 +15,7 @@ def generate_paged_list(topic, page):
     pages_numb = ceil(topic_len / page_size)
 
     back_button = types.InlineKeyboardButton("🔥 " + ans.Answers.back + "(" + str(page + 1) + "/" + str(pages_numb) + ")",
-        callback_data=ans.Answers.back + "back to sections")
+                                             callback_data=ans.Answers.back + "back to sections")
 
     if pages_numb > 1:
         if page == 0:
@@ -61,16 +62,41 @@ def generate_topic_markup(topic, first_button, last_button):
 
 def kb_for_matan(first_button, last_button):
 
+    intr_button = types.InlineKeyboardButton(Math.intr,
+                                             callback_data=Math.intr)
     lim_button = types.InlineKeyboardButton(Math.lim,
                                             callback_data=Math.lim)
-    integral_button = types.InlineKeyboardButton(Math.integral,
-                                                 callback_data=Math.integral)
     diff_button = types.InlineKeyboardButton(Math.diff,
                                              callback_data=Math.diff)
+    unc_int_button = types.InlineKeyboardButton(Math.unc_int,
+                                                callback_data=Math.unc_int)
+    cer_int_button = types.InlineKeyboardButton(Math.cer_int,
+                                                callback_data=Math.cer_int)
+    seq_ser_button = types.InlineKeyboardButton(Math.seq_ser,
+                                                callback_data=Math.seq_ser)
+    fourier_ser_button = types.InlineKeyboardButton(Math.fourier_ser,
+                                                    callback_data=Math.fourier_ser)
+    diff_few_var_button = types.InlineKeyboardButton(Math.diff_few_var,
+                                                     callback_data=Math.diff_few_var)
+    doub_int_button = types.InlineKeyboardButton(Math.doub_int,
+                                                 callback_data=Math.doub_int)
+    trip_int_button = types.InlineKeyboardButton(Math.trip_int,
+                                                 callback_data=Math.trip_int)
+    mult_int_button = types.InlineKeyboardButton(Math.mult_int,
+                                                 callback_data=Math.mult_int)
+    curv_int_button = types.InlineKeyboardButton(Math.curv_int,
+                                                 callback_data=Math.curv_int)
+    surf_int_button = types.InlineKeyboardButton(Math.lim,
+                                                 callback_data=Math.lim)
+    field_th_button = types.InlineKeyboardButton(Math.field_th,
+                                                 callback_data=Math.field_th)
     # back_button = types.InlineKeyboardButton("🔥 " + ans.Answers.back,
     #                                         callback_data=ans.Answers.back + "back to sections")
 
-    buttons_list = [lim_button, integral_button, diff_button]*3
+    buttons_list = [intr_button, lim_button, diff_button, unc_int_button,
+                    cer_int_button, seq_ser_button, fourier_ser_button,
+                    diff_few_var_button, doub_int_button, trip_int_button,
+                    mult_int_button, curv_int_button, surf_int_button, field_th_button]
 
     # matan_markup = types.InlineKeyboardMarkup(row_width=1)
     # matan_markup.add(lim_button, diff_button, integral_button)
@@ -84,12 +110,26 @@ def kb_for_linal(first_button, last_button):
                                                callback_data=Math.matrix)
     determinant_button = types.InlineKeyboardButton(Math.determinant,
                                                     callback_data=Math.determinant)
-    clay_button = types.InlineKeyboardButton(Math.clay,
-                                             callback_data=Math.clay)
+    slough_button = types.InlineKeyboardButton(Math.slough,
+                                               callback_data=Math.slough)
+    quad_form_button = types.InlineKeyboardButton(Math.quad_form,
+                                                  callback_data=Math.quad_form)
+    lin_space_button = types.InlineKeyboardButton(Math.lin_space,
+                                                  callback_data=Math.lin_space)
+    eucl_space_button = types.InlineKeyboardButton(Math.eucl_space,
+                                                   callback_data=Math.eucl_space)
+    polynom_button = types.InlineKeyboardButton(Math.polynom,
+                                                callback_data=Math.polynom)
+    field_button = types.InlineKeyboardButton(Math.field,
+                                              callback_data=Math.field)
+    group_button = types.InlineKeyboardButton(Math.group,
+                                              callback_data=Math.group)
     # back_button = types.InlineKeyboardButton("🔥 " + ans.Answers.back,
     #                                         callback_data=ans.Answers.back + "back to sections")
 
-    buttons_list = [matrix_button, determinant_button, clay_button]*6
+    buttons_list = [matrix_button, determinant_button, slough_button,
+                    quad_form_button, lin_space_button, eucl_space_button,
+                    polynom_button, field_button, group_button]
 
     # linal_markup = types.InlineKeyboardMarkup(row_width=1)
     # linal_markup.add(matrix_button, determinant_button, clay_button)
@@ -99,16 +139,37 @@ def kb_for_linal(first_button, last_button):
 
 def kb_for_geom(first_button, last_button):
 
-    scalar_button = types.InlineKeyboardButton(Math.scalar_product,
-                                               callback_data=Math.scalar_product)
-    plane_button = types.InlineKeyboardButton(Math.plane,
-                                              callback_data=Math.plane)
-    curves_button = types.InlineKeyboardButton(Math.curves,
-                                               callback_data=Math.curves)
+    coord_plan_button = types.InlineKeyboardButton(Math.coord_plan,
+                                                   callback_data=Math.coord_plan)
+    line_equat_button = types.InlineKeyboardButton(Math.line_equat,
+                                                   callback_data=Math.line_equat)
+    line_plan_button = types.InlineKeyboardButton(Math.line_plan,
+                                                  callback_data=Math.line_plan)
+    seqt_th_button = types.InlineKeyboardButton(Math.seqt_th,
+                                                callback_data=Math.seqt_th)
+    coord_trans_button = types.InlineKeyboardButton(Math.coord_trans,
+                                                    callback_data=Math.coord_trans)
+    det_sec_thir_button = types.InlineKeyboardButton(Math.det_sec_thir,
+                                                     callback_data=Math.det_sec_thir)
+    coord_spac_button = types.InlineKeyboardButton(Math.coord_spac,
+                                                   callback_data=Math.coord_spac)
+    vect_alg_button = types.InlineKeyboardButton(Math.vect_alg,
+                                                 callback_data=Math.vect_alg)
+    geom_equat_button = types.InlineKeyboardButton(Math.geom_equat,
+                                                   callback_data=Math.geom_equat)
+    line_spac_button = types.InlineKeyboardButton(Math.line_spac,
+                                                  callback_data=Math.line_spac)
+    plan_spac_button = types.InlineKeyboardButton(Math.plan_spac,
+                                                  callback_data=Math.plan_spac)
+    surf_sec_button = types.InlineKeyboardButton(Math.surf_sec,
+                                                 callback_data=Math.surf_sec)
     # back_button = types.InlineKeyboardButton("🔥 " + ans.Answers.back,
     #                                         callback_data=ans.Answers.back + "back to sections")
 
-    buttons_list = [scalar_button, plane_button, curves_button]*10
+    buttons_list = [coord_plan_button, line_equat_button, line_plan_button,
+                    seqt_th_button, coord_trans_button, det_sec_thir_button,
+                    coord_spac_button, vect_alg_button, geom_equat_button,
+                    line_spac_button, plan_spac_button, surf_sec_button]
 
     # geom_markup = types.InlineKeyboardMarkup(row_width=1)
     # geom_markup.add(scalar_button, plane_button, curves_button)
@@ -141,22 +202,48 @@ class Math:
     geom = "Аналитическя геометрия."
 
     # number of sections in every topic
-    topic_sizes_dict = {matan: 9, linal: 18, geom: 30}
+    topic_sizes_dict = {matan: 14, linal: 9, geom: 12}
 
     # темы матана
-    lim = "Пределы."
-    integral = "Интегралы."
-    diff = "Производные."
+    intr = "Введение."
+    lim = "Пределы и непрерывность функции."
+    diff = "Дифференцирование функций."
+    unc_int = "Неопределенный интеграл."
+    cer_int = "Определенный интеграл."
+    seq_ser = "Бесконечные последовательности и ряды."
+    fourier_ser = "Ряды Фурье."
+    diff_few_var = "Дифференцирование функций нескольких переменных."
+    doub_int = "Двойные интегралы."
+    trip_int = "Тройные интегралы."
+    mult_int = "Многократные интегралы."
+    curv_int = "Криволинейные интегралы."
+    surf_int = "Поверхностные интегралы."
+    field_th = "Элементы теории поля."
 
     # темы линала
     matrix = "Матрицы."
-    determinant = "Определители."
-    clay = "Слау."
+    determinant = "Определитель."
+    slough = "Системы линейных уравнений."
+    quad_form = "Квадратичные формы."
+    lin_space = "Линейные пространства."
+    eucl_space = "Евклидово и унитарное пространства."
+    polynom = "Многочлены."
+    field = "Поля."
+    group = "Группы."
 
     # темы геометрии
-    scalar_product = "Скалярное произведение."
-    curves = "Кривые на плоскости."
-    plane = "Плоскость."
+    coord_plan = "Системы координат на плоскости."
+    line_equat = "Линии и их уравнения."
+    line_plan = "Прямая на плоскости."
+    seqt_th = "Теория конических сечений."
+    coord_trans = "Преобразование координат."
+    det_sec_thir = "Определители 2-го и 3-го порядка."
+    coord_spac = "Системы координат в пространстве."
+    vect_alg = "Элементы векторной алгебры."
+    geom_equat = "Геометрическое значение уравнений."
+    line_spac = "Прямая в пространстве."
+    plan_spac = "Плоскость в пространстве."
+    surf_sec = "Кривые и поверхности 2-го порядка."
 
     math_ans = "Выберите раздел:"
 
