@@ -4,6 +4,8 @@ from telebot import types
 import re
 
 import mth
+import themes
+import theorems
 from conf import Config
 from ans import Answers
 from mth import Math
@@ -49,11 +51,10 @@ def send_text(message):
                                           "последовательно переходите по кнопкам")
 
 
+#  check that the inline button for the theme worked
 def is_section(data):
-    if "section" in data.split('.'):
-        return True
-    return False
-    
+    return "section" in data.split('.')
+
 
 @bot.callback_query_handler(func=lambda call: is_section(call.data))
 def query_handler(call):
@@ -62,11 +63,28 @@ def query_handler(call):
     topic = data[0]
     page = data[-1]
 
-    if topic+"." in [Math.matan, Math.linal, Math.geom]:
-        kb = mth.generate_paged_list(topic+".", int(page))
+    if topic + "." in [Math.matan, Math.linal, Math.geom]:
+        kb = themes.generate_paged_list_themes(topic + ".", int(page))
 
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
                           text="Вы выбрали раздел: " + topic + "\nТеперь выберите тему.")
+
+
+#  check that the inline button for the theorem worked
+def is_theorem(data):
+    return "theorem" in data.split('.')
+
+
+@bot.callback_query_handler(func=lambda call: is_theorem(call.data))
+def query_handler(call):
+    data = call.data.split('.')
+    theme = data[0]
+    page = data[-1]
+
+    kb = theorems.generate_paged_list_theorems(theme + ".", int(page))
+
+    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
+                          text="Вы выбрали тему: " + theme + "\nТеперь выберите теорему.")
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith("back to sections"))
@@ -76,6 +94,17 @@ def query_handler(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                               reply_markup=mth.start_kb_for_high_school(),
                               text=Math.math_ans)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith("back to themes"))
+def query_handler(call):
+    data = call.data.split('.')
+    theme = data[0] + '.'
+    need_section = Math.giveNeedSection(theme)
+    markup = themes.generate_paged_list_themes(need_section, 0)
+    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                          reply_markup=markup,
+                          text="Вы выбрали раздел: " + need_section + "\nТеперь выберите тему.")
 
 
 bot.polling(none_stop=False, interval=1, timeout=20)
