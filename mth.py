@@ -31,19 +31,19 @@ class Math:
     # темы матана
     intr = "Введение."
     lim = "Пределы и непр-ые функции."
-    diff = "Дифференцирование функций."
+    diff = "Дифф-ие функций."
     unc_int = "Неопределенный интеграл."
     cer_int = "Определенный интеграл."
     seq_ser = "Бесконечные посл-ти и ряды."
     fourier_ser = "Ряды Фурье."
-    diff_few_var = "Дифф-е ф-ций неск. переменных."
+    diff_few_var = "Дифф ф-й неск п-ых."
     doub_int = "Двойные интегралы."
     trip_int = "Тройные интегралы."
     mult_int = "Многократные интегралы."
     curv_int = "Криволинейные интегралы."
     surf_int = "Поверхностные интегралы."
     field_th = "Элементы теории поля."
-    math_theme_list = [intr, lim, diff, unc_int, cer_int, fourier_ser, diff_few_var,
+    math_theme_list = [intr, lim, diff, unc_int, cer_int, seq_ser, fourier_ser, diff_few_var,
                        doub_int, trip_int, mult_int, curv_int, surf_int, field_th]
 
     # темы линала
