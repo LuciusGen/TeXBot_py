@@ -19,6 +19,7 @@ bot = telebot.TeleBot(bot_token)
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
+    """Answer for /start command"""
     bot.send_message(message.chat.id, Answers.start_ans, reply_markup=Answers.main_markup, parse_mode='markdown')
 
 
@@ -36,6 +37,7 @@ def convert_latex(message):
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
+    """Buttons settings"""
     if message.text == '📚Вышмат':
         bot.send_message(message.chat.id, Math.math_ans, reply_markup=mth.start_kb_for_high_school())
 
@@ -58,6 +60,7 @@ def is_section(data):
 
 @bot.callback_query_handler(func=lambda call: is_section(call.data))
 def query_handler(call):
+    """Inline buttons for themes"""
     kb = types.InlineKeyboardMarkup()
     data = call.data.split('.')
     topic = data[0]
@@ -77,6 +80,7 @@ def is_theorem(data):
 
 @bot.callback_query_handler(func=lambda call: is_theorem(call.data))
 def query_handler(call):
+    """Inline buttons for theorems"""
     data = call.data.split('.')
     theme = data[0]
     page = data[-1]
@@ -89,6 +93,7 @@ def query_handler(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith("back to sections"))
 def query_handler(call):
+    """Back inline button, to sections"""
     data = call.data[:-len('back to sections')]
     if data == Answers.back:
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -98,9 +103,10 @@ def query_handler(call):
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith("back to themes"))
 def query_handler(call):
+    """back inline button, to themes"""
     data = call.data.split('.')
     theme = data[0] + '.'
-    need_section = Math.giveNeedSection(theme)
+    need_section = Math.give_need_section(theme)
     markup = themes.generate_paged_list_themes(need_section, 0)
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup,

@@ -1,6 +1,5 @@
 from telebot import types
-import ans
-from math import ceil
+
 
 
 # template of callback data: "[name-of-topic].[section].[page-number]"
@@ -80,7 +79,7 @@ class Math:
     math_ans = "Выберите раздел:"
 
     @staticmethod
-    def giveNeedSection(theme):
+    def give_need_section(theme):
         if theme in Math.math_theme_list:
             return Math.matan
         elif theme in Math.linal_theme_list:

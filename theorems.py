@@ -1,5 +1,4 @@
 import ans
-from mth import Math
 from math import ceil
 from telebot import types
 
@@ -51,7 +50,7 @@ def generate_theorems(first_button, last_button):  # so far, let's change the fu
     return markup
 
 
-#  теоремы матана(пока толкьо интерейс)
+#  math theorems(now only for interface)
 theorem1 = "Теорема 1"
 theorem2 = "Теорема 2"
 theorem3 = "Теорема 3"

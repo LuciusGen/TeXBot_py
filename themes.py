@@ -4,6 +4,9 @@ from math import ceil
 from telebot import types
 
 
+# This file need to show all themes in inline buttons
+#  Download themes from mth.py file(Math class)
+
 def generate_paged_list_themes(topic, page):
     # numb of sections per page
     page_size = 9
