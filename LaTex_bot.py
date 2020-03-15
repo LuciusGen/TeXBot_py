@@ -12,6 +12,8 @@ from mth import Math
 
 url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
 url_team_leader = 'https://t.me/dont_open'
+url_bit_coin = 'https://topcash.me/ru/yamrub_to_btc'
+bit_coin_bill = 'bc1qwz2rcelzqdwh8y4kqupk3q5qrtsayltvnf955c'
 bot_token = Config.get_token()
 
 bot = telebot.TeleBot(bot_token)
@@ -43,6 +45,8 @@ def send_text(message):
 
     if message.text == '💰Помощь проекту':
         bot.send_message(message.chat.id, url_donate_path)
+        bot.send_message(message.chat.id, url_bit_coin)
+        bot.send_message(message.chat.id, "Для доната в btc используйте счет Bitcoin кошелька: " + bit_coin_bill)
 
     if message.text == '☝Рекомендации':
         bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + url_team_leader)
