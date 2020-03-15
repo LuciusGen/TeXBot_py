@@ -1,7 +1,10 @@
+
 # -*- coding: utf-8 -*-
 import telebot
 from telebot import types
 import re
+import sympy
+import matplotlib.pyplot as plt
 
 import mth
 import themes
@@ -14,6 +17,7 @@ url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
 url_team_leader = 'https://t.me/dont_open'
 url_bit_coin = 'https://topcash.me/ru/yamrub_to_btc'
 bit_coin_bill = 'bc1qwz2rcelzqdwh8y4kqupk3q5qrtsayltvnf955c'
+
 bot_token = Config.get_token()
 
 bot = telebot.TeleBot(bot_token)
@@ -27,14 +31,29 @@ def start_message(message):
 
 @bot.message_handler(regexp=r"^\/tex .+")
 def convert_latex(message):
+    """Converting Latex commands into .png images"""
     regex = r"^\/tex (.+)"
     parser = re.search(regex, message.text)
     tex_command = parser.group(1)
+    try:
+        lat = sympy.latex(tex_command)
 
-    # Заглушка. Убрать, когда сделаем генерацию картинки
-    bot.send_message(message.chat.id,
-                     "Вы ввели команду *\"" + tex_command + "\"*. Вскоре я научусь переводить её в картинку!",
-                     parse_mode='markdown')
+        fig = plt.gca(frame_on=False)
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
+
+        plt.text(0.5, 0.5, r"$%s$" % lat, fontsize=45, horizontalalignment='center', verticalalignment='center')
+
+        plt.savefig('converted.png')
+        bot.send_photo(message.chat.id, open('converted.png', 'rb'))
+        plt.close()
+    except:
+        bot.send_message(message.chat.id, "Допущен некорректный символ при написании формулы")
+
+        # Заглушка. Убрать, когда сделаем генерацию картинки
+    # bot.send_message(message.chat.id,
+    #                "Вы ввели команду *\"" + tex_command + "\"*. Вскоре я научусь переводить её в картинку!",
+    #                 parse_mode='markdown')
 
 
 @bot.message_handler(content_types=['text'])
