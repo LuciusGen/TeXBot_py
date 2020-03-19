@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 import telebot
 from telebot import types
@@ -11,6 +12,11 @@ import theorems
 from conf import Config
 from ans import Answers
 from mth import Math
+
+url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
+url_team_leader = 'https://t.me/dont_open'
+url_bit_coin = 'https://topcash.me/ru/yamrub_to_btc'
+bit_coin_bill = 'bc1qwz2rcelzqdwh8y4kqupk3q5qrtsayltvnf955c'
 
 bot_token = Config.get_token()
 
@@ -43,6 +49,7 @@ def convert_latex(message):
         plt.close()
     except:
         bot.send_message(message.chat.id, "Допущен некорректный символ при написании формулы")
+        plt.close()
 
         # Заглушка. Убрать, когда сделаем генерацию картинки
     # bot.send_message(message.chat.id,
@@ -57,13 +64,12 @@ def send_text(message):
         bot.send_message(message.chat.id, Math.math_ans, reply_markup=mth.start_kb_for_high_school())
 
     if message.text == '💰Помощь проекту':
-        bot.send_message(message.chat.id, Answers.url_donate_path)
-        bot.send_message(message.chat.id, Answers.url_bit_coin)
-        bot.send_message(message.chat.id, "Для доната в btc используйте счет Bitcoin кошелька: "
-                         + Answers.bit_coin_bill)
+        bot.send_message(message.chat.id, url_donate_path)
+        bot.send_message(message.chat.id, url_bit_coin)
+        bot.send_message(message.chat.id, "Для доната в btc используйте счет Bitcoin кошелька: " + bit_coin_bill)
 
     if message.text == '☝Рекомендации':
-        bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + Answers.url_team_leader)
+        bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + url_team_leader)
 
     if message.text == '❔Справка':
         bot.send_message(message.chat.id, "/tex <формула> - конвертирует <формула> в картинку с ней. "
