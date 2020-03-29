@@ -103,6 +103,7 @@ def kb_for_matan(first_button, last_button):
 
 
 def kb_for_linal(first_button, last_button):
+    """Linal buttons"""
     start_page = 0
     matrix_button = types.InlineKeyboardButton(Math.matrix,
                                                callback_data=Math.matrix + "theorem." + str(start_page))
@@ -131,6 +132,7 @@ def kb_for_linal(first_button, last_button):
 
 
 def kb_for_geom(first_button, last_button):
+    """Geometry buttons"""
     start_page = 0
     coord_plan_button = types.InlineKeyboardButton(Math.coord_plan,
                                                    callback_data=Math.coord_plan + "theorem." + str(start_page))

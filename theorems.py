@@ -57,6 +57,7 @@ theorem3 = "Теорема 3"
 theorem4 = "Теорема 4"
 theorem5 = "Теорема 5"
 theorem6 = "Теорема 6"
+
 theorem1_button = types.InlineKeyboardButton(theorem1,
                                              callback_data=theorem1)
 theorem2_button = types.InlineKeyboardButton(theorem2,
@@ -69,5 +70,6 @@ theorem5_button = types.InlineKeyboardButton(theorem5,
                                              callback_data=theorem5)
 theorem6_button = types.InlineKeyboardButton(theorem6,
                                              callback_data=theorem6)
+
 matan_theorems_buttons = [theorem1_button, theorem2_button, theorem3_button,
                           theorem4_button, theorem5_button, theorem6_button]

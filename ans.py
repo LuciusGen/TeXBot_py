@@ -2,6 +2,7 @@ from telebot import types
 
 
 class Answers:
+    """Class for bot answers"""
 
     main_markup = types.ReplyKeyboardMarkup()
     main_markup.row('📚Вышмат', '☝Рекомендации')
