@@ -1,6 +1,13 @@
-class Config:
+import _sqlite3
 
-    __token = "1066730014:AAHZbRoSafPzhtN30lZJbMi6BR9yPl7c17Q"
+class Config:
+    conn = _sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM conf")
+    __token = cursor.fetchall()[0][0]
+
+    conn.close()
 
     @staticmethod
     def get_token() -> str:
