@@ -28,12 +28,11 @@ def start_message(message):
 def convert_latex(message):
     """Converting Latex commands into .png images"""
     regex = r"^\/tex (.+)"
-    # parse text by command
     parser = re.search(regex, message.text)
     tex_command = parser.group(1)
     try:
         lat = sympy.latex(tex_command)
-        # manipulations to generate picture
+
         fig = plt.gca(frame_on=False)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
@@ -46,6 +45,11 @@ def convert_latex(message):
     except:
         bot.send_message(message.chat.id, "Допущен некорректный символ при написании формулы")
         plt.close()
+
+        # Заглушка. Убрать, когда сделаем генерацию картинки
+    # bot.send_message(message.chat.id,
+    #                "Вы ввели команду *\"" + tex_command + "\"*. Вскоре я научусь переводить её в картинку!",
+    #                 parse_mode='markdown')
 
 
 @bot.message_handler(content_types=['text'])
@@ -69,8 +73,8 @@ def send_text(message):
                                           "последовательно переходите по кнопкам")
 
 
+#  check that the inline button for the theme worked
 def is_section(data):
-    """For the inline buttons in themes"""
     return "section" in data.split('.')
 
 
@@ -89,9 +93,13 @@ def query_handler(call):
                           text="Вы выбрали раздел: " + topic + "\nТеперь выберите тему.")
 
 
+#  check that the inline button for the theorem worked
 def is_theorem(data):
-    """For the inline buttons in theorems"""
     return "theorem" in data.split('.')
+
+
+def is_in_base(data):
+    return "T" in data.split('.')
 
 
 @bot.callback_query_handler(func=lambda call: is_theorem(call.data))
@@ -105,6 +113,23 @@ def query_handler(call):
 
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
                           text="Вы выбрали тему: " + theme + "\nТеперь выберите теорему.")
+
+
+@bot.callback_query_handler(func=lambda call: is_in_base(call.data))
+def query_handler(call):
+    """Inline buttons to send data theorems"""
+    _, theme, numb = call.data.split('.')
+    theme += '.'
+
+    conn = _sqlite3.connect('database.db')  # create data base
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT * FROM " + "[" + theme + "]" + "WHERE [callback_data]=" + numb)
+    inf = cursor.fetchall()
+    conn.close()
+
+    bot.send_message(chat_id=call.message.chat.id, text=inf[0][2])  # in future will be pict and .tex
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith("back to sections"))
@@ -124,7 +149,6 @@ def query_handler(call):
     theme = data[0] + '.'
     need_section = Math.give_need_section(theme)
     markup = themes.generate_paged_list_themes(need_section, 0)
-
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup,
                           text="Вы выбрали раздел: " + need_section + "\nТеперь выберите тему.")

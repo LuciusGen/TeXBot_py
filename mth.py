@@ -1,6 +1,7 @@
 from telebot import types
 
 
+
 # template of callback data: "[name-of-topic].[section].[page-number]"
 def start_kb_for_high_school():
     # section - отвечает за кнопку "раздел"

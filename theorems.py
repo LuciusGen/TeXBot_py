@@ -1,3 +1,5 @@
+import _sqlite3
+
 import ans
 from math import ceil
 from telebot import types
@@ -5,7 +7,8 @@ from telebot import types
 
 def generate_paged_list_theorems(theme, page):
     # numb of sections per page
-    page_size = 2
+    page_size = 9
+    theorems_from_database(theme)
 
     # numb of all sections in topic
     topic_len = len(matan_theorems_buttons)
@@ -39,37 +42,37 @@ def generate_paged_list_theorems(theme, page):
             markup = generate_theorems(page * page_size, topic_len)
         markup.row(left_button, back_button, right_button)
     else:
-        markup = generate_theorems(page, topic_len)
+        markup = generate_theorems(page, topic_len, theme)
         markup.add(back_button)
     return markup
 
 
-def generate_theorems(first_button, last_button):  # so far, let's change the future
+def theorems_from_database(theme):
+    matan_theorems_buttons.clear()
+    try:
+        conn = _sqlite3.connect('database.db')  # create data base
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM " + "[" + theme + "]")
+        math = cursor.fetchall()
+        conn.close()
+
+        for i in math:
+            theorem = i[0]
+            matan_theorems_buttons.append(types.InlineKeyboardButton(theorem,
+                                                                 callback_data="T." + theme + i[1]))
+    except:
+        conn.close()
+
+        for i in range(6):
+            matan_theorems_buttons.append(types.InlineKeyboardButton("theorem" + str(i),
+                                                                     callback_data="theorem" + str(i)))
+
+
+def generate_theorems(first_button, last_button, theme):  # so far, let's change the future
     markup = types.InlineKeyboardMarkup(row_width=1)
     markup.add(*(matan_theorems_buttons[first_button:last_button]))
     return markup
 
 
-#  math theorems(now only for interface)
-theorem1 = "Теорема 1"
-theorem2 = "Теорема 2"
-theorem3 = "Теорема 3"
-theorem4 = "Теорема 4"
-theorem5 = "Теорема 5"
-theorem6 = "Теорема 6"
-
-theorem1_button = types.InlineKeyboardButton(theorem1,
-                                             callback_data=theorem1)
-theorem2_button = types.InlineKeyboardButton(theorem2,
-                                             callback_data=theorem2)
-theorem3_button = types.InlineKeyboardButton(theorem3,
-                                             callback_data=theorem3)
-theorem4_button = types.InlineKeyboardButton(theorem4,
-                                             callback_data=theorem4)
-theorem5_button = types.InlineKeyboardButton(theorem5,
-                                             callback_data=theorem5)
-theorem6_button = types.InlineKeyboardButton(theorem6,
-                                             callback_data=theorem6)
-
-matan_theorems_buttons = [theorem1_button, theorem2_button, theorem3_button,
-                          theorem4_button, theorem5_button, theorem6_button]
+matan_theorems_buttons = []
