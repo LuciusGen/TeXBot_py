@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
+
 import telebot
 from telebot import types
 import re
@@ -129,7 +131,13 @@ def query_handler(call):
     inf = cursor.fetchall()
     conn.close()
 
-    bot.send_message(chat_id=call.message.chat.id, text=inf[0][2])  # in future will be pict and .tex
+    script_path = os.path.abspath(__file__)
+    script_dir = os.path.split(script_path)[0]
+    rel_path = "images/image1.jpg"
+    abs_file_path = os.path.join(script_dir, rel_path)
+
+    bot.send_photo(call.message.chat.id, open(abs_file_path, 'rb'))
+    bot.send_message(call.message.chat.id, text="TeX code of this theorem:" + inf[0][3])
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith("back to sections"))
