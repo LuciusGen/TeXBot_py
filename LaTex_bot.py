@@ -133,7 +133,7 @@ def query_handler(call):
 
     script_path = os.path.abspath(__file__)
     script_dir = os.path.split(script_path)[0]
-    rel_path = "images/image1.jpg"
+    rel_path = "images/" + inf[0][2]
     abs_file_path = os.path.join(script_dir, rel_path)
 
     bot.send_photo(call.message.chat.id, open(abs_file_path, 'rb'))
