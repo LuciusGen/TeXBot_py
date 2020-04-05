@@ -60,26 +60,32 @@ def cnt_size(str_list):
     hor_size = 800 / max_len
     ver_size = 300 / (cnt*2)
 
-    return min(hor_size, ver_size, max_size)
+    size = min(hor_size, ver_size, max_size)
+
+    if size < 15:
+        size = 15
+
+    return size
 
 
 def convert_lat(lat):
-    non_expr = dict({"\le" :"\leq", "\ge": "\geq", "\owns": "\ni",
-                "\gggtr": "\ggg", "\llless": "\lll", "\Hat": "\hat",
-                "\Vec": "\vec", "\mathstrut": "", "\displaystyle": "",
-                "\tfrac": "\frac", "\nolimits": "\limits", "\idotsint": "\int\dots\int",
-                "\mathop": "", "\text": "", "\lvert": "|",
-                "\rvert": "|", "\lVert": "\Vert", "\rVert": "\Vert",
-                "\bigl": "", "\Bigl": "", "\biggl": "",
-                "\Biggl": "", "\bigr": "", "\Bigr": "",
-                "\biggr": "", "\Biggr": "", "\bigm": "",
-                "\Bigm": "", "\biggm": "", "\Biggm": "",
-                "\big": "", "\Big": "", "\bigg": "",
-                "\Bigg": "", "\gets": "\leftarrow", "\mod": "\quad mod \quad",
-                "\tbinom": "\binom", "\dbinom": "\binom",
-                "\smash[b]": "", "\smash[t]": "", "\tag": "",
-                "&": "\quad", "\mathop": "", "\pmb": "",
-                "\bmod": "\quad mod \quad", "\pmod": "\quad mod \quad"})
+    non_expr = dict({r"\left": "", r"\ge": r"\geq", r"\owns": r"\ni",
+                r"\gggtr": r"\ggg", r"\llless": r"\lll", r"\Hat": r"\hat",
+                r"\Vec": r"\vec", r"\mathstrut": "", r"\displaystyle": "",
+                r"\tfrac": r"\frac", r"\nolimits": r"\limits", r"\idotsint": r"\int\dots\int",
+                r"\mathop": "", r"\text": "", r"\lvert": "|",
+                r"\rvert": "|", r"\lVert": r"\Vert", r"\rVert": r"\Vert",
+                r"\bigl": "", r"\Bigl": "", r"\biggl": "",
+                r"\Biggl": "", r"\bigr": "", r"\Bigr": "",
+                r"\biggr": "", "\Biggr": "", r"\bigm": "",
+                "\Bigm": "", r"\biggm": "", r"\Biggm": "",
+                r"\big": "", r"\Big": "", r"\bigg": "",
+                r"\Bigg": "", r"\gets": r"\leftarrow", r"\mod": r"\quad mod \quad",
+                r"\tbinom": r"\binom", r"\dbinom": r"\binom",
+                r"\smash[b]": "", r"\smash[t]": "", r"\tag": "",
+                "&": r"\quad", r"\mathop": "", r"\pmb": "",
+                r"\bmod": r"\quad mod \quad", r"\pmod": r"\quad mod \quad",
+                r"\le": r"\leq", r"\right": "", r"\nonumber": ""})
 
     list_keys = list(non_expr.keys())
 
@@ -94,12 +100,14 @@ def convert_lat(lat):
 def parse_command(tex_command):
     lat_dict = dict()
 
-    find_lat_list(tex_command, "$", "$", False, ["\*", "\allowbreak"], lat_dict)
-    find_lat_list(tex_command, "\(", "\)", False, ["\*", "\allowbreak"], lat_dict)
-    find_lat_list(tex_command, "\begin{math}", "\end{math}", False, ["\*", "\allowbreak"], lat_dict)
-    find_lat_list(tex_command, "\[", "\]", True, ["\*", "\allowbreak"], lat_dict)
-    find_lat_list(tex_command, "\begin{equation}", "\end{equation}", True, ["\*", "\allowbreak"], lat_dict)
-    find_lat_list(tex_command, "\begin{eqnarray}", "\end{eqnarray}", True, ["\\"], lat_dict)
+    next_line_expr = [r"\*", r"\allowbreak", r"\\"]
+
+    find_lat_list(tex_command, r"$", r"$", False, next_line_expr, lat_dict)
+    find_lat_list(tex_command, r"\(", r"\)", False, next_line_expr, lat_dict)
+    find_lat_list(tex_command, r"\begin{math}", r"\end{math}", False, next_line_expr, lat_dict)
+    find_lat_list(tex_command, r"\[", r"\]", True, next_line_expr, lat_dict)
+    find_lat_list(tex_command, r"\begin{equation}", r"\end{equation}", True, next_line_expr, lat_dict)
+    find_lat_list(tex_command, r"\begin{eqnarray}", r"\end{eqnarray}", True, next_line_expr, lat_dict)
 
     if (len(lat_dict) != 0):
         lat_str = list()
@@ -133,7 +141,7 @@ def parse_command(tex_command):
     else:
         lat_list = list()
         lat_str = list()
-        find_next_line(tex_command, ["\*", "\allowbreak"], lat_list)
+        find_next_line(tex_command, next_line_expr, lat_list)
 
         for lat in lat_list:
             expr = convert_lat(lat)
