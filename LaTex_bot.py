@@ -13,6 +13,7 @@ import theorems
 from conf import Config
 from ans import Answers
 from mth import Math
+from parse import parse_command
 import _sqlite3
 
 bot_token = Config.get_token()
@@ -33,13 +34,16 @@ def convert_latex(message):
     parser = re.search(regex, message.text)
     tex_command = parser.group(1)
     try:
-        lat = sympy.latex(tex_command)
+        lat_str, size = parse_command(tex_command)
 
         fig = plt.gca(frame_on=False)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
 
-        plt.text(0.5, 0.5, r"$%s$" % lat, fontsize=45, horizontalalignment='center', verticalalignment='center')
+        for id, lat in enumerate(lat_str):
+            hor_pos = 0.5
+            vert_pos = 1 / (2 * len(lat_str)) * (2 * (len(lat_str) - id) - 1)
+            plt.text(hor_pos, vert_pos, lat, fontsize=size, horizontalalignment='center', verticalalignment='center')
 
         plt.savefig('converted.png')
         bot.send_photo(message.chat.id, open('converted.png', 'rb'))
