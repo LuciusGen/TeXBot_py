@@ -93,7 +93,7 @@ def query_handler(call):
     page = data[-1]
 
     if topic + "." in [Math.matan, Math.linal, Math.geom]:
-        kb = themes.generate_paged_list_themes(topic + ".", int(page))
+        kb = Answers.gen_paged_list(topic + ".", "section", int(page), page_size=9)
 
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
                           text="Вы выбрали раздел: " + topic + "\nТеперь выберите тему.")
@@ -115,7 +115,7 @@ def query_handler(call):
     theme = data[0]
     page = data[-1]
 
-    kb = theorems.generate_paged_list_theorems(theme + ".", int(page))
+    kb = Answers.gen_paged_list(theme + ".", "theorem", int(page), page_size=9)
 
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
                           text="Вы выбрали тему: " + theme + "\nТеперь выберите теорему.")
@@ -160,7 +160,7 @@ def query_handler(call):
     data = call.data.split('.')
     theme = data[0] + '.'
     need_section = Math.give_need_section(theme)
-    markup = themes.generate_paged_list_themes(need_section, 0)
+    markup = Answers.gen_paged_list(need_section, "section", 0, page_size=9)
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup,
                           text="Вы выбрали раздел: " + need_section + "\nТеперь выберите тему.")
