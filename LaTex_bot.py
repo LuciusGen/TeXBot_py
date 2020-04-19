@@ -42,7 +42,8 @@ def convert_latex(message):
 
         for id, lat in enumerate(lat_str):
             if id % 10 == 0 and id != 0:
-                plt.show()
+                plt.savefig('converted.png')
+                bot.send_photo(message.chat.id, open('converted.png', 'rb'))
                 plt.close()
                 fig = plt.gca(frame_on=False)
                 fig.axes.get_xaxis().set_visible(False)

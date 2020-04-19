@@ -84,8 +84,8 @@ def convert_lat(expr):
 
 
 def func_replace(lat):
-    non_expr = dict({r"\left ": " ", r"\ge ": r"\geq ", r"\owns ": r"\ni ",
-                r"\gggtr ": r"\ggg ", r"\llless ": r"\lll ", r"\Hat ": r"\hat",
+    non_expr = dict({r"\leftidx": " ", r"\left": " ", r"\ge": r"\geq ", r"\owns": r"\ni ",
+                r"\gggtr": r"\ggg", r"\llless": r"\lll", r"\Hat": r"\hat",
                 r"\Vec": r"\vec", r"\mathstrut": "", r"\displaystyle": "",
                 r"\tfrac": r"\frac", r"\nolimits": r"\limits", r"\idotsint": r"\int\dots\int",
                 r"\mathop": "", r"\text": "", r"\lvert": "|",
@@ -160,7 +160,7 @@ def find_brac_expr(expr, pos, indiv_index):
     first = pos
     pos += 1
 
-    while expr[first: pos].count('{') != expr[first: pos].count('}'):
+    while pos < len(expr) and expr[first: pos].count('{') != expr[first: pos].count('}'):
         pos += 1
 
     index = (first, pos - 1)
@@ -227,7 +227,7 @@ def cnt_func_len(expr, pos, indiv_index):
     pos += 1
     func_len = 2
 
-    while expr[pos].isalpha():
+    while pos < len(expr) and expr[pos].isalpha():
         pos += 1
 
     last = pos
