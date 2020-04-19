@@ -33,17 +33,26 @@ def convert_latex(message):
     regex = r"^\/tex (.+)"
     parser = re.search(regex, message.text)
     tex_command = parser.group(1)
+
     try:
         lat_str, size = parse_command(tex_command)
-
         fig = plt.gca(frame_on=False)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
 
         for id, lat in enumerate(lat_str):
+            if id % 10 == 0 and id != 0:
+                plt.show()
+                plt.close()
+                fig = plt.gca(frame_on=False)
+                fig.axes.get_xaxis().set_visible(False)
+                fig.axes.get_yaxis().set_visible(False)
+
             hor_pos = 0.5
-            vert_pos = 1 / (2 * len(lat_str)) * (2 * (len(lat_str) - id) - 1)
-            plt.text(hor_pos, vert_pos, lat, fontsize=size, horizontalalignment='center', verticalalignment='center')
+            vert_pos = 1/(2*min(len(lat_str), 10))*(2*(min(len(lat_str), 10)-id % 10)-1)
+
+            if len(lat) != 0:
+                plt.text(hor_pos, vert_pos, lat, fontsize=size, horizontalalignment='center', verticalalignment='center')
 
         plt.savefig('converted.png')
         bot.send_photo(message.chat.id, open('converted.png', 'rb'))
