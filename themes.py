@@ -1,51 +1,9 @@
-import ans
 from mth import Math
-from math import ceil
 from telebot import types
 
 
 # This file need to show all themes in inline buttons
 #  Download themes from mth.py file(Math class)
-
-def generate_paged_list_themes(topic, page):
-    # numb of sections per page
-    page_size = 9
-
-    # numb of all sections in topic
-    topic_len = Math.get_topic_size(topic)
-
-    # numb of pages
-    pages_numb = ceil(topic_len / page_size)
-
-    back_button = types.InlineKeyboardButton(
-        "🔥 " + ans.Answers.back + "(" + str(page + 1) + "/" + str(pages_numb) + ")",
-        callback_data=ans.Answers.back + "back to sections")
-
-    if pages_numb > 1:
-        if page == 0:
-            where_left = pages_numb - 1
-            where_right = page + 1
-        elif page == pages_numb - 1:
-            where_left = page - 1
-            where_right = 0
-        else:
-            where_left = page - 1
-            where_right = page + 1
-
-        left_button = types.InlineKeyboardButton("⬅(" + str(where_left + 1) + "/" + str(pages_numb) + ")",
-                                                 callback_data=topic + "section." + str(where_left))
-
-        right_button = types.InlineKeyboardButton("➡(" + str(where_right + 1) + "/" + str(pages_numb) + ")",
-                                                  callback_data=topic + "section." + str(where_right))
-        if (page + 1) * page_size <= topic_len:
-            markup = generate_topic_markup(topic, page * page_size, (page + 1) * page_size)
-        else:
-            markup = generate_topic_markup(topic, page * page_size, topic_len)
-        markup.row(left_button, back_button, right_button)
-    else:
-        markup = generate_topic_markup(topic, page, topic_len)
-        markup.add(back_button)
-    return markup
 
 
 def generate_topic_markup(topic, first_button, last_button):
@@ -103,6 +61,7 @@ def kb_for_matan(first_button, last_button):
 
 
 def kb_for_linal(first_button, last_button):
+    """Linal buttons"""
     start_page = 0
     matrix_button = types.InlineKeyboardButton(Math.matrix,
                                                callback_data=Math.matrix + "theorem." + str(start_page))
@@ -131,6 +90,7 @@ def kb_for_linal(first_button, last_button):
 
 
 def kb_for_geom(first_button, last_button):
+    """Geometry buttons"""
     start_page = 0
     coord_plan_button = types.InlineKeyboardButton(Math.coord_plan,
                                                    callback_data=Math.coord_plan + "theorem." + str(start_page))

@@ -1,5 +1,6 @@
-
 # -*- coding: utf-8 -*-
+import os
+
 import telebot
 from telebot import types
 import re
@@ -12,11 +13,8 @@ import theorems
 from conf import Config
 from ans import Answers
 from mth import Math
-
-url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
-url_team_leader = 'https://t.me/dont_open'
-url_bit_coin = 'https://topcash.me/ru/yamrub_to_btc'
-bit_coin_bill = 'bc1qwz2rcelzqdwh8y4kqupk3q5qrtsayltvnf955c'
+from parse import parse_command
+import _sqlite3
 
 bot_token = Config.get_token()
 
@@ -36,13 +34,16 @@ def convert_latex(message):
     parser = re.search(regex, message.text)
     tex_command = parser.group(1)
     try:
-        lat = sympy.latex(tex_command)
+        lat_str, size = parse_command(tex_command)
 
         fig = plt.gca(frame_on=False)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
 
-        plt.text(0.5, 0.5, r"$%s$" % lat, fontsize=45, horizontalalignment='center', verticalalignment='center')
+        for id, lat in enumerate(lat_str):
+            hor_pos = 0.5
+            vert_pos = 1 / (2 * len(lat_str)) * (2 * (len(lat_str) - id) - 1)
+            plt.text(hor_pos, vert_pos, lat, fontsize=size, horizontalalignment='center', verticalalignment='center')
 
         plt.savefig('converted.png')
         bot.send_photo(message.chat.id, open('converted.png', 'rb'))
@@ -64,12 +65,13 @@ def send_text(message):
         bot.send_message(message.chat.id, Math.math_ans, reply_markup=mth.start_kb_for_high_school())
 
     if message.text == '💰Помощь проекту':
-        bot.send_message(message.chat.id, url_donate_path)
-        bot.send_message(message.chat.id, url_bit_coin)
-        bot.send_message(message.chat.id, "Для доната в btc используйте счет Bitcoin кошелька: " + bit_coin_bill)
+        bot.send_message(message.chat.id, Answers.url_donate_path)
+        bot.send_message(message.chat.id, Answers.url_bit_coin)
+        bot.send_message(message.chat.id, "Для доната в btc используйте счет Bitcoin кошелька: "
+                         + Answers.bit_coin_bill)
 
     if message.text == '☝Рекомендации':
-        bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + url_team_leader)
+        bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + Answers.url_team_leader)
 
     if message.text == '❔Справка':
         bot.send_message(message.chat.id, "/tex <формула> - конвертирует <формула> в картинку с ней. "
@@ -91,7 +93,7 @@ def query_handler(call):
     page = data[-1]
 
     if topic + "." in [Math.matan, Math.linal, Math.geom]:
-        kb = themes.generate_paged_list_themes(topic + ".", int(page))
+        kb = Answers.gen_paged_list(topic + ".", "section", int(page), page_size=9)
 
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
                           text="Вы выбрали раздел: " + topic + "\nТеперь выберите тему.")
@@ -102,6 +104,10 @@ def is_theorem(data):
     return "theorem" in data.split('.')
 
 
+def is_in_base(data):
+    return "T" in data.split('.')
+
+
 @bot.callback_query_handler(func=lambda call: is_theorem(call.data))
 def query_handler(call):
     """Inline buttons for theorems"""
@@ -109,10 +115,33 @@ def query_handler(call):
     theme = data[0]
     page = data[-1]
 
-    kb = theorems.generate_paged_list_theorems(theme + ".", int(page))
+    kb = Answers.gen_paged_list(theme + ".", "theorem", int(page), page_size=9)
 
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=kb,
                           text="Вы выбрали тему: " + theme + "\nТеперь выберите теорему.")
+
+
+@bot.callback_query_handler(func=lambda call: is_in_base(call.data))
+def query_handler(call):
+    """Inline buttons to send data theorems"""
+    _, theme, numb = call.data.split('.')
+    theme += '.'
+
+    conn = _sqlite3.connect('database.db')  # create data base
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT * FROM " + "[" + theme + "]" + "WHERE [callback_data]=" + numb)
+    inf = cursor.fetchall()
+    conn.close()
+
+    script_path = os.path.abspath(__file__)
+    script_dir = os.path.split(script_path)[0]
+    rel_path = "images/" + theme.replace('.', '') + '/' + inf[0][2]
+    abs_file_path = os.path.join(script_dir, rel_path)
+
+    bot.send_photo(call.message.chat.id, open(abs_file_path, 'rb'))
+    bot.send_message(call.message.chat.id, text="TeX code of this theorem:" + inf[0][3])
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith("back to sections"))
@@ -131,7 +160,7 @@ def query_handler(call):
     data = call.data.split('.')
     theme = data[0] + '.'
     need_section = Math.give_need_section(theme)
-    markup = themes.generate_paged_list_themes(need_section, 0)
+    markup = Answers.gen_paged_list(need_section, "section", 0, page_size=9)
     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                           reply_markup=markup,
                           text="Вы выбрали раздел: " + need_section + "\nТеперь выберите тему.")
