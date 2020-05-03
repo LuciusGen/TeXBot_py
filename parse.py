@@ -90,7 +90,7 @@ def func_replace(lat):
                 r"\tfrac": r"\frac", r"\nolimits": r"\limits", r"\idotsint": r"\int\dots\int",
                 r"\mathop": "", r"\text": "", r"\lvert": "|",
                 r"\rvert": "|", r"\lVert": r"\Vert", r"\rVert": r"\Vert",
-                r"\bigl": "", r"\Bigl": "", r"\biggl": "",
+                r"\bigcup": r"\cup", r"\bigl": "", r"\Bigl": "", r"\biggl": "",
                 r"\Biggl": "", r"\bigr": "", r"\Bigr": "",
                 r"\biggr": "", "\Biggr": "", r"\bigm": "",
                 "\Bigm": "", r"\biggm": "", r"\Biggm": "", r"\nolimits": "",
@@ -98,9 +98,8 @@ def func_replace(lat):
                 r"\Bigg": "", r"\gets": r"\leftarrow", r"\mod": r"\quad mod \quad",
                 r"\tbinom": r"\binom", r"\dbinom": r"\binom",
                 r"\smash[b]": "", r"\smash[t]": "", r"\tag": "",
-                "&": r"\quad", r"\mathop": "", r"\pmb": "",
-                r"\bmod": r"\quad mod \quad", r"\pmod": r"\quad mod \quad",
-                r"\le": r"\leq", r"\right": "", r"\nonumber": ""})
+                r"\mathop": "", r"\pmb": "", r"\bmod": r"\quad mod \quad",
+                r"\pmod": r"\quad mod \quad", r"\le": r"\leq", r"\right": "", r"\nonumber": ""})
 
     list_keys = list(non_expr.keys())
 
