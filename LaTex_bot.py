@@ -21,6 +21,11 @@ bot_token = Config.get_token()
 bot = telebot.TeleBot(bot_token)
 
 
+@bot.edited_message_handler(regexp=r"^\/tex .+")
+def edited_convert_latex(message):
+    convert_latex(message)
+
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
     """Answer for /start command"""
