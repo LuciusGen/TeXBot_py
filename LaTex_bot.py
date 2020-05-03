@@ -40,16 +40,25 @@ def convert_latex(message):
     tex_command = parser.group(1)
 
     try:
+        png_list = list()
+        pdf_list = list()
+
         lat_str, size = parse_command(tex_command)
+
         fig = plt.gca(frame_on=False)
         fig.axes.get_xaxis().set_visible(False)
         fig.axes.get_yaxis().set_visible(False)
 
         for id, lat in enumerate(lat_str):
             if id % 10 == 0 and id != 0:
-                plt.savefig('converted.png')
-                bot.send_photo(message.chat.id, open('converted.png', 'rb'))
+                png_name = 'converted%i.png' % (id % 10)
+                pdf_name = 'converted%i.pdf' % (id % 10)
+                plt.savefig(png_name)
+                png_list.append(png_name)
+                plt.savefig(pdf_name)
+                pdf_list.append(pdf_name)
                 plt.close()
+
                 fig = plt.gca(frame_on=False)
                 fig.axes.get_xaxis().set_visible(False)
                 fig.axes.get_yaxis().set_visible(False)
@@ -61,16 +70,19 @@ def convert_latex(message):
                 plt.text(hor_pos, vert_pos, lat, fontsize=size, horizontalalignment='center', verticalalignment='center')
 
         plt.savefig('converted.png')
-        bot.send_photo(message.chat.id, open('converted.png', 'rb'))
+        png_list.append('converted.png')
+        plt.savefig('converted.pdf')
+        pdf_list.append('converted.pdf')
         plt.close()
+
+        for png in png_list:
+            bot.send_photo(message.chat.id, open(png, 'rb'))
+
+        for pdf in pdf_list:
+            bot.send_document(message.chat.id, open(pdf, 'rb'))
     except:
         bot.send_message(message.chat.id, "Допущен некорректный символ при написании формулы")
         plt.close()
-
-        # Заглушка. Убрать, когда сделаем генерацию картинки
-    # bot.send_message(message.chat.id,
-    #                "Вы ввели команду *\"" + tex_command + "\"*. Вскоре я научусь переводить её в картинку!",
-    #                 parse_mode='markdown')
 
 
 @bot.message_handler(content_types=['text'])
