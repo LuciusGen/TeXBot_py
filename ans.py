@@ -19,6 +19,10 @@ class Answers:
     start_ans = "Приветствую. Бот позволяет генерировать картинки из кода LaTex, " \
                 "также здесь содержатся основные темы вышмата"
 
+    reference_ans = "/tex <формула> - конвертирует <формула> в картинку с ней." \
+                    " Для выбора тем по высшей математике" \
+                    " последовательно переходите по кнопкам"
+
     url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
     url_team_leader = 'https://t.me/dont_open'
     url_bit_coin = 'https://topcash.me/ru/yamrub_to_btc'

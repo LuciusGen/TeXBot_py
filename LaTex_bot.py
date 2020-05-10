@@ -32,6 +32,12 @@ def start_message(message):
     bot.send_message(message.chat.id, Answers.start_ans, reply_markup=Answers.main_markup, parse_mode='markdown')
 
 
+@bot.message_handler(commands=['help'])
+def start_message(message):
+    """Answer for /help command"""
+    bot.send_message(message.chat.id, Answers.reference_ans)
+
+
 @bot.message_handler(regexp=r"^\/tex .+")
 def convert_latex(message):
     """Converting Latex commands into .png images"""
@@ -101,9 +107,7 @@ def send_text(message):
         bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + Answers.url_team_leader)
 
     if message.text == '❔Справка':
-        bot.send_message(message.chat.id, "/tex <формула> - конвертирует <формула> в картинку с ней. "
-                                          "Для выбора тем по высшей математике "
-                                          "последовательно переходите по кнопкам")
+        bot.send_message(message.chat.id, Answers.reference_ans)
 
 
 #  check that the inline button for the theme worked
