@@ -49,7 +49,11 @@ def convert_latex(message):
         png_list = list()
         pdf_list = list()
 
-        lat_str, size = parse_command(tex_command)
+        lat_str, size, error = parse_command(tex_command)
+
+        if len(error) != 0:
+            bot.send_message(message.chat.id, error)
+            return
 
         fig = plt.gca(frame_on=False)
         fig.axes.get_xaxis().set_visible(False)
