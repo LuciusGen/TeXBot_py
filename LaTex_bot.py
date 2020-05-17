@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 
+from flask import Flask, request
 import telebot
 from telebot import types
 import re
-import sympy
 import matplotlib.pyplot as plt
 
 import mth
-import themes
-import theorems
 from conf import Config
 from ans import Answers
 from mth import Math
@@ -19,6 +17,10 @@ import _sqlite3
 bot_token = Config.get_token()
 
 bot = telebot.TeleBot(bot_token)
+
+server = Flask(__name__)
+
+hook_url = Config.get_url()
 
 
 @bot.edited_message_handler(regexp=r"^\/tex .+")
@@ -32,12 +34,6 @@ def start_message(message):
     bot.send_message(message.chat.id, Answers.start_ans, reply_markup=Answers.main_markup, parse_mode='markdown')
 
 
-@bot.message_handler(commands=['help'])
-def start_message(message):
-    """Answer for /help command"""
-    bot.send_message(message.chat.id, Answers.reference_ans)
-
-
 @bot.message_handler(regexp=r"^\/tex .+")
 def convert_latex(message):
     """Converting Latex commands into .png images"""
@@ -49,11 +45,7 @@ def convert_latex(message):
         png_list = list()
         pdf_list = list()
 
-        lat_str, size, error = parse_command(tex_command)
-
-        if len(error) != 0:
-            bot.send_message(message.chat.id, error)
-            return
+        lat_str, size = parse_command(tex_command)
 
         fig = plt.gca(frame_on=False)
         fig.axes.get_xaxis().set_visible(False)
@@ -111,7 +103,9 @@ def send_text(message):
         bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + Answers.url_team_leader)
 
     if message.text == '❔Справка':
-        bot.send_message(message.chat.id, Answers.reference_ans)
+        bot.send_message(message.chat.id, "/tex <формула> - конвертирует <формула> в картинку с ней. "
+                                          "Для выбора тем по высшей математике "
+                                          "последовательно переходите по кнопкам")
 
 
 #  check that the inline button for the theme worked
@@ -201,4 +195,18 @@ def query_handler(call):
                           text="Вы выбрали раздел: " + need_section + "\nТеперь выберите тему.")
 
 
-bot.polling(none_stop=False, interval=1, timeout=20)
+@server.route("/bot", methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(
+        url=hook_url+"bot")  # этот url нужно заменить на url вашего Хероку приложения
+    return "?", 200
+
+
+server.run(host="0.0.0.0", port=os.environ.get('PORT', 80))
