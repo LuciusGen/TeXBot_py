@@ -371,8 +371,10 @@ def cnt_func_len(expr, pos, indiv_index):
         if pos != expr_len:
             if expr[pos] == '{':
                 arg_len, pos, error = find_brac_expr(expr, pos, indiv_index)
+            elif expr[pos] != '_' and expr[pos] != '^' and not is_func(expr[pos]):
+                pos += 1
 
-        func_with_arg = cp.deepcopy(expr[first: pos+1])
+        func_with_arg = cp.deepcopy(expr[first: pos])
 
         if not verify_expr(func_with_arg):
             error = "Ошибка: функция %s не поддерживается или написана неверно" % func
