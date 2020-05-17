@@ -21,7 +21,10 @@ class Answers:
 
     reference_ans = "/tex <формула> - конвертирует <формула> в картинку с ней." \
                     " Для выбора тем по высшей математике" \
-                    " последовательно переходите по кнопкам"
+                    " последовательно переходите по кнопкам.\nСписок поддерживаемых формул" \
+                    " можно посмотреть здесь: \n" \
+                    "https://en.wikibooks.org/wiki/LaTeX/Mathematics#Inserting_%22Displayed" \
+                    "%22_maths_inside_blocks_of_text .\nКонструкция" + r"\begin{}..\end{} не работает."
 
     url_donate_path = 'https://money.yandex.ru/to/4100111962148422'
     url_team_leader = 'https://t.me/dont_open'
