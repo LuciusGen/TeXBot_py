@@ -156,6 +156,9 @@ def cnt_symb_len(expr, pos, cnt, indiv_index):
     elif is_func(expr[pos]):
         func_len, pos, error = cnt_func_len(expr, pos, indiv_index)
         cnt += func_len
+    elif expr[pos] == '{':
+        text_len, pos, error = find_brac_expr(expr, pos, indiv_index)
+        cnt += text_len
     else:
         if not expr[pos].isalpha():
             if not verify_expr(expr[pos]):
@@ -356,13 +359,26 @@ def cnt_func_len(expr, pos, indiv_index):
         return func_len, pos, error
 
     func = cp.deepcopy(expr[first:last])
+    arg_len = 0
 
     if func != r"\frac":
-        if not verify_expr(func):
+        expr_len = len(expr)
+
+        if pos != expr_len:
+            while expr[pos] == ' ':
+                pos += 1
+
+        if pos != expr_len:
+            if expr[pos] == '{':
+                arg_len, pos, error = find_brac_expr(expr, pos, indiv_index)
+
+        func_with_arg = cp.deepcopy(expr[first: pos+1])
+
+        if not verify_expr(func_with_arg):
             error = "Ошибка: функция %s не поддерживается или написана неверно" % func
 
     if func in letter_func:
-        func_len = len(func) - 1
+        func_len = len(func) - 1 + arg_len
     elif func == r"\frac":
         func_len, pos, error = cnt_frac(expr, pos, indiv_index)
 
