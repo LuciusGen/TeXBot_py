@@ -81,8 +81,16 @@ def verify_expr(expr):
 
     plt.text(0.5, 0.5, str, fontsize=15, horizontalalignment='center',
                          verticalalignment='center')
-    plt.savefig('check.png')
+    try:
+        plt.savefig('check.png')
+    except:
+        plt.close()
+        return False
+
     plt.close()
+
+    return True
+
 
 
 def convert_lat(expr):
@@ -150,9 +158,7 @@ def cnt_symb_len(expr, pos, cnt, indiv_index):
         cnt += func_len
     else:
         if not expr[pos].isalpha():
-            try:
-                verify_expr(expr[pos])
-            except:
+            if not verify_expr(expr[pos]):
                 error = "Ошибка: символ %s не поддерживается" % expr[pos]
 
         cnt += 1
@@ -188,7 +194,19 @@ def find_brac_expr(expr, pos, indiv_index):
 
         pos += 1
 
+    if first == pos-2:
+        error = "Ошибка: пустые скобки {}"
+        return 0, pos, error
+
     index = (first, pos - 1)
+
+    for id, symb in enumerate(expr[first+1: pos-1]):
+        if symb != ' ':
+            break
+
+        if id == (pos-first-2)-1:
+            error = "Ошибка: пустые скобки {}"
+            return 0, pos, error
 
     indiv_index.append(index)
     cnt, error = cnt_expr_len(expr[first+1: pos-1])
@@ -331,9 +349,7 @@ def cnt_func_len(expr, pos, indiv_index):
         pos += 1
         func = cp.deepcopy(expr[first:pos])
 
-        try:
-            verify_expr(func)
-        except:
+        if not verify_expr(func):
             error = "Ошибка: функция %s не поддерживается или написана неверно" % func
 
         func_len = 1
@@ -342,9 +358,7 @@ def cnt_func_len(expr, pos, indiv_index):
     func = cp.deepcopy(expr[first:last])
 
     if func != r"\frac":
-        try:
-            verify_expr(func)
-        except:
+        if not verify_expr(func):
             error = "Ошибка: функция %s не поддерживается или написана неверно" % func
 
     if func in letter_func:
