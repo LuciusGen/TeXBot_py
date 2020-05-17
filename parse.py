@@ -73,6 +73,26 @@ def cnt_fontsize(len_list):
     return size
 
 
+def verify_expr(expr):
+    str = convert_lat(expr)
+    fig = plt.gca(frame_on=False)
+    fig.axes.get_xaxis().set_visible(False)
+    fig.axes.get_yaxis().set_visible(False)
+
+    plt.text(0.5, 0.5, str, fontsize=15, horizontalalignment='center',
+                         verticalalignment='center')
+    try:
+        plt.savefig('check.png')
+    except:
+        plt.close()
+        return False
+
+    plt.close()
+
+    return True
+
+
+
 def convert_lat(expr):
     if len(expr) != 0:
         lat = sympy.latex(expr)
@@ -91,7 +111,7 @@ def func_replace(lat):
                 r"\mathop": "", r"\text": "", r"\lvert": "|",
                 r"\rvert": "|", r"\lVert": r"\Vert", r"\rVert": r"\Vert",
                 r"\bigcup": r"\cup", r"\bigl": "", r"\Bigl": "", r"\biggl": "",
-                r"\Biggl": "", r"\bigr": "", r"\Bigr": "",
+                r"\Biggl": "", r"\bigr": "", r"\Bigr": "", r"\&": "&",
                 r"\biggr": "", "\Biggr": "", r"\bigm": "",
                 "\Bigm": "", r"\biggm": "", r"\Biggm": "", r"\nolimits": "",
                 r"\big": "", r"\Big": "", r"\bigg": "", r"\limits": "",
@@ -121,24 +141,33 @@ def is_index_symb(symb):
 
 
 def cnt_symb_len(expr, pos, cnt, indiv_index):
+    error = ""
+
     if expr[pos] == ' ':
         pos += 1
-        return pos, cnt
+        return pos, cnt, error
 
     if is_double_symb(expr[pos]):
         cnt += 2
         pos += 1
     elif is_index_symb(expr[pos]):
-        index_len, pos = cnt_index_len(expr, pos, indiv_index)
+        index_len, pos, error = cnt_index_len(expr, pos, indiv_index)
         cnt += index_len
     elif is_func(expr[pos]):
-        func_len, pos = cnt_func_len(expr, pos, indiv_index)
+        func_len, pos, error = cnt_func_len(expr, pos, indiv_index)
         cnt += func_len
+    elif expr[pos] == '{':
+        text_len, pos, error = find_brac_expr(expr, pos, indiv_index)
+        cnt += text_len
     else:
+        if not expr[pos].isalpha():
+            if not verify_expr(expr[pos]):
+                error = "Ошибка: символ %s не поддерживается" % expr[pos]
+
         cnt += 1
         pos += 1
 
-    return pos, cnt
+    return pos, cnt, error
 
 
 def cnt_expr_len(expr):
@@ -147,46 +176,103 @@ def cnt_expr_len(expr):
     indiv_index = list()
 
     while True:
-        pos, cnt = cnt_symb_len(expr, pos, cnt, indiv_index)
+        pos, cnt, error = cnt_symb_len(expr, pos, cnt, indiv_index)
 
-        if pos == len(expr):
+        if pos == len(expr) or len(error) != 0:
             break
 
-    return cnt
+    return cnt, error
 
 
 def find_brac_expr(expr, pos, indiv_index):
+    expr_len = len(expr)
+
     first = pos
     pos += 1
 
-    while pos < len(expr) and expr[first: pos].count('{') != expr[first: pos].count('}'):
+    while expr[first: pos].count('{') != expr[first: pos].count('}'):
+        if pos == expr_len:
+            error = "Ошибка: пропущена закрывающая скобка }"
+            return 0, pos, error
+
         pos += 1
+
+    if first == pos-2:
+        error = "Ошибка: пустые скобки {}"
+        return 0, pos, error
 
     index = (first, pos - 1)
 
-    indiv_index.append(index)
-    cnt = cnt_expr_len(expr[first+1: pos-1])
+    for id, symb in enumerate(expr[first+1: pos-1]):
+        if symb != ' ':
+            break
 
-    return cnt, pos
+        if id == (pos-first-2)-1:
+            error = "Ошибка: пустые скобки {}"
+            return 0, pos, error
+
+    indiv_index.append(index)
+    cnt, error = cnt_expr_len(expr[first+1: pos-1])
+
+    return cnt, pos, error
+
+
+def cnt_index_val(expr, pos, indiv_index):
+    error = ""
+    expr_len = len(expr)
+    pos += 1
+
+    if pos == expr_len:
+        error = r"Ошибка: отсутствует значение индекса"
+        return 0, pos, error
+
+    while expr[pos] == ' ':
+        pos += 1
+        if pos == expr_len:
+            error = r"Ошибка: отсутствует значение индекса"
+            return 0, pos, error
+
+    if expr[pos] == "{":
+        index_len, pos, error = find_brac_expr(expr, pos, indiv_index)
+    elif expr[pos] == '^' or expr[pos] == '_' or is_func(expr[pos]):
+        error = r"Ошибка: отсутствует значение индекса"
+        return 0, pos, error
+    else:
+        index_len = 1
+        pos += 1
+
+    return index_len, pos, error
 
 
 def cnt_index_len(expr, pos, indiv_index):
-    index_len = 1
+    expr_len = len(expr)
     first = pos
-    pos += 1
 
-    if expr[pos] == "{":
-        index_len, pos = find_brac_expr(expr, pos, indiv_index)
-    else:
-        pos += 1
+    index_len, pos, error = cnt_index_val(expr, pos, indiv_index)
 
-    if pos != len(expr) and expr[pos] == '^' and expr[first-1] == '_':
-        up_index_len, pos = find_brac_expr(expr, pos, indiv_index)
+    if len(error) != 0:
+        return 0, pos, error
+
+    if pos != expr_len:
+        while expr[pos] == ' ':
+            pos += 1
+            if pos == expr_len:
+                break
+
+    if pos != expr_len and ((expr[pos] == '^' and expr[first] == '_') or
+                            (expr[pos] == '_' and expr[first] == '^')):
+        up_index_len, pos, error = cnt_index_val(expr, pos, indiv_index)
+
         index_len = max(index_len, up_index_len)
+
+    if pos != expr_len and ((expr[pos] == '_' and expr[first] == '_') or
+                            (expr[pos] == '^' and expr[first] == '^')):
+        error = r"Ошибка: указано несколько индексов одного типа"
+        return 0, pos, error
 
     index_len = math.ceil(0.75*index_len)
 
-    return index_len, pos
+    return index_len, pos, error
 
 
 def is_double_symb(symb):
@@ -207,16 +293,41 @@ def is_func(symb):
     return False
 
 
+def cnt_frac_arg(expr, pos, indiv_index):
+    expr_len = len(expr)
+
+    if pos == expr_len:
+        error = r"Ошибка: отсутствуют аргументы функции \frac"
+        return 0, pos, error
+
+    while expr[pos] == ' ':
+        pos += 1
+        if pos == expr_len:
+            error = r"Ошибка: отсутствуют аргументы функции \frac"
+            return 0, pos, error
+
+    if expr[pos] != "{":
+        error = r"Ошибка: отсутствуют аргументы функции \frac"
+        return 0, pos, error
+
+    return find_brac_expr(expr, pos, indiv_index)
+
+
 def cnt_frac(expr, pos, indiv_index):
-    numer_len, pos = find_brac_expr(expr, pos, indiv_index)
-    denom_len, pos = find_brac_expr(expr, pos, indiv_index)
+    numer_len, pos, error = cnt_frac_arg(expr, pos, indiv_index)
+
+    if len(error) != 0:
+        return 0, pos, error
+
+    denom_len, pos, error = cnt_frac_arg(expr, pos, indiv_index)
 
     func_len = math.ceil(0.75*max(numer_len, denom_len))
 
-    return func_len, pos
+    return func_len, pos, error
 
 
 def cnt_func_len(expr, pos, indiv_index):
+    error = ""
     letter_func = [r"\arccos", r"\cos", r"\csc", r"\hom", r"\log", r"\tan",
                    r"\arcsin", r"\cosh", r"\deg", r"\ker", r"\sec", r"\tanh",
                    r"\arctan", r"\cot", r"\dim", r"\lg", r"\sin",
@@ -224,6 +335,12 @@ def cnt_func_len(expr, pos, indiv_index):
 
     first = pos
     pos += 1
+
+    if pos == len(expr):
+        error = r"Ошибка: символ \ неверно использован"
+
+        return 0, pos, error
+
     func_len = 2
 
     while pos < len(expr) and expr[pos].isalpha():
@@ -233,17 +350,41 @@ def cnt_func_len(expr, pos, indiv_index):
 
     if last == first + 1:
         pos += 1
+        func = cp.deepcopy(expr[first:pos])
+
+        if not verify_expr(func):
+            error = "Ошибка: функция %s не поддерживается или написана неверно" % func
+
         func_len = 1
-        return func_len, pos
+        return func_len, pos, error
 
     func = cp.deepcopy(expr[first:last])
+    arg_len = 0
+
+    if func != r"\frac":
+        expr_len = len(expr)
+
+        if pos != expr_len:
+            while expr[pos] == ' ':
+                pos += 1
+
+        if pos != expr_len:
+            if expr[pos] == '{':
+                arg_len, pos, error = find_brac_expr(expr, pos, indiv_index)
+            elif expr[pos] != '_' and expr[pos] != '^' and not is_func(expr[pos]):
+                pos += 1
+
+        func_with_arg = cp.deepcopy(expr[first: pos])
+
+        if not verify_expr(func_with_arg):
+            error = "Ошибка: функция %s не поддерживается или написана неверно" % func
 
     if func in letter_func:
-        func_len = len(func) - 1
+        func_len = len(func) - 1 + arg_len
     elif func == r"\frac":
-        func_len, pos = cnt_frac(expr, pos, indiv_index)
+        func_len, pos, error = cnt_frac(expr, pos, indiv_index)
 
-    return func_len, pos
+    return func_len, pos, error
 
 
 def pos_in_indiv_index(cur_pos, indiv_index):
@@ -292,18 +433,20 @@ def parse_expr(expr, cur_len):
     pos = 0
 
     while True:
-        pos, cnt = cnt_symb_len(expr, pos, cnt, indiv_index)
+        pos, cnt, error = cnt_symb_len(expr, pos, cnt, indiv_index)
+
+        if len(error) != 0:
+            return expr_list, expr_len, error
 
         if cnt >= max_len:
             cur_expr, expr = split_expr(expr, pos, indiv_index)
+
             pos = 0
             cnt = 0
 
             if len(cur_expr) == 0 and cur_len == 0:
-                str = convert_lat(expr)
-                expr_list.append(str)
-                expr_len.append(max_len)
-                break
+                error = "Ошибка: слишком длинная формула"
+                return expr_list, expr_len, error
 
             str = convert_lat(cur_expr)
             expr_list.append(str)
@@ -317,10 +460,11 @@ def parse_expr(expr, cur_len):
             expr_len.append(cnt)
             break
 
-    return expr_list, expr_len
+    return expr_list, expr_len, error
 
 
 def parse_str(cur_str, cur_len):
+    error = ""
     str_list = list()
     str_len = list()
     str = cp.deepcopy(cur_str)
@@ -349,21 +493,25 @@ def parse_str(cur_str, cur_len):
                     str_list.append(" ")
                     str_len.append(0)
                 else:
-                    str_list.append(str)
-                    str_len.append(len(str))
+                    error = "Ошибка: слишком длинная строка"
+                    return str_list, str_len, error
 
         if cur_len != 0:
             max_len = 40
             cur_len = 0
 
-    return str_list, str_len
+    return str_list, str_len, error
 
 
 def split_str(str, cur_len, lat_str, len_list, is_next_line):
+    error = ""
     str_len = len(str) + cur_len
 
     if str_len > 40:
-        str_list, str_len = parse_str(str, cur_len)
+        str_list, str_len, error = parse_str(str, cur_len)
+
+        if len(error) != 0:
+            return error
 
         for id in range(len(str_list)):
             if not is_next_line:
@@ -384,8 +532,11 @@ def split_str(str, cur_len, lat_str, len_list, is_next_line):
             lat_str.append(str)
             len_list.append(str_len)
 
+    return error
+
 
 def parse_command(tex_command):
+    error = ""
     lat_dict = dict()
     len_list = list()
 
@@ -407,16 +558,25 @@ def parse_command(tex_command):
         for key in list_keys:
             if len(lat_str) == 0:
                 str = cp.deepcopy(tex_command[start:key[0]])
-                split_str(str, 0, lat_str, len_list, True)
+                error = split_str(str, 0, lat_str, len_list, True)
+
+                if len(error) != 0:
+                    return None, 0, error
             else:
                 str = cp.deepcopy(tex_command[start:key[0]])
-                split_str(str, len_list[len(lat_str) - 1], lat_str, len_list, False)
+                error = split_str(str, len_list[len(lat_str) - 1], lat_str, len_list, False)
+
+                if len(error) != 0:
+                    return None, 0, error
 
             for id, lat in enumerate(lat_dict[key]):
                 expr = func_replace(lat)
                 if len(expr) > 0:
                     if id == 0:
-                        expr_list, expr_len = parse_expr(expr, len_list[len(lat_str)-1])
+                        expr_list, expr_len, error = parse_expr(expr, len_list[len(lat_str)-1])
+
+                        if len(error) != 0:
+                            return None, 0, error
 
                         for id in range(len(expr_list)):
                             if id == 0:
@@ -427,7 +587,10 @@ def parse_command(tex_command):
                             len_list.append(expr_len[id])
 
                     else:
-                        expr_list, expr_len = parse_expr(expr, 0)
+                        expr_list, expr_len, error = parse_expr(expr, 0)
+
+                        if len(error) != 0:
+                            return None, 0, error
 
                         for id in range(len(expr_list)):
                             lat_str.append(expr_list[id])
@@ -437,11 +600,14 @@ def parse_command(tex_command):
 
         if start != len(tex_command):
             str = cp.deepcopy(tex_command[start:])
-            split_str(str, len_list[len(lat_str) - 1], lat_str, len_list, False)
+            error = split_str(str, len_list[len(lat_str) - 1], lat_str, len_list, False)
+
+            if len(error) != 0:
+                return None, 0, error
 
         fontsize = cnt_fontsize(len_list)
 
-        return lat_str, fontsize
+        return lat_str, fontsize, error
     else:
         lat_list = list()
         lat_str = list()
@@ -449,7 +615,10 @@ def parse_command(tex_command):
 
         for lat in lat_list:
             expr = func_replace(lat)
-            expr_list, expr_len = parse_expr(expr, 0)
+            expr_list, expr_len, error = parse_expr(expr, 0)
+
+            if len(error) != 0:
+                return None, 0, error
 
             for id in range(len(expr_list)):
                 lat_str.append(expr_list[id])
@@ -457,6 +626,6 @@ def parse_command(tex_command):
 
         fontsize = cnt_fontsize(len_list)
 
-        return lat_str, fontsize
+        return lat_str, fontsize, error
 
-    return None, 0
+    return None, 0, error

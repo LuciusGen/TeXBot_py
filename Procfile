@@ -1,1 +1,1 @@
-worker: python LaTex_bot.py
+web: python LaTex_bot.py

@@ -11,6 +11,12 @@ class Config:
 
     conn.close()
 
+    __url = 'https://latex-edit-bot.herokuapp.com/'
+
     @staticmethod
     def get_token() -> str:
         return Config.__token
+
+    @staticmethod
+    def get_url() -> str:
+        return Config.__url
