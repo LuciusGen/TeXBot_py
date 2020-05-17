@@ -195,6 +195,48 @@ def query_handler(call):
                           text="Вы выбрали раздел: " + need_section + "\nТеперь выберите тему.")
 
 
+@bot.inline_handler(lambda query: len(query.query) > 0)
+def query_text(inline_query):
+    tex_command = inline_query.query
+    try:
+
+        lat_str, size, error = parse_command(tex_command)
+
+        if len(error) != 0:
+            r = types.InlineQueryResultArticle('1', 'Result1',
+                                               types.InputTextMessageContent("Ошибка в конвертации."))
+            bot.answer_inline_query(inline_query.id, [r])
+            return
+
+        fig = plt.gca(frame_on=False)
+        fig.axes.get_xaxis().set_visible(False)
+        fig.axes.get_yaxis().set_visible(False)
+
+        if len(lat_str) > 10:
+            r = types.InlineQueryResultArticle('1', 'Result1',
+                                               types.InputTextMessageContent("Ошибка, выражение слишком длинное."))
+            bot.answer_inline_query(inline_query.id, [r])
+            return
+
+        for id, lat in enumerate(lat_str):
+            hor_pos = 0.5
+            vert_pos = 1 / (2 * min(len(lat_str), 10)) * (2 * (min(len(lat_str), 10) - id % 10) - 1)
+
+            if len(lat) != 0:
+                plt.text(hor_pos, vert_pos, lat, fontsize=size, horizontalalignment='center',
+                         verticalalignment='center')
+
+        plt.savefig('converted.png')
+        plt.close()
+        photo_id = bot.send_photo('267362684', open('converted.png', 'rb')).photo[0].file_id
+        r = types.InlineQueryResultCachedPhoto(id=0, photo_file_id=photo_id)
+
+        bot.answer_inline_query(inline_query.id, [r], cache_time=1)
+    except Exception as e:
+        print(e)
+        plt.close()
+
+
 @server.route("/bot", methods=['POST'])
 def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
