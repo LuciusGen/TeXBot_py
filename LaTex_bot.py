@@ -203,9 +203,10 @@ def query_text(inline_query):
         lat_str, size, error = parse_command(tex_command)
 
         if len(error) != 0:
-            r = types.InlineQueryResultArticle('1', 'Result1',
+            r = types.InlineQueryResultArticle('1', 'Ошибка в конвертации',
                                                types.InputTextMessageContent("Ошибка в конвертации."))
             bot.answer_inline_query(inline_query.id, [r])
+            plt.close()
             return
 
         fig = plt.gca(frame_on=False)
@@ -213,9 +214,10 @@ def query_text(inline_query):
         fig.axes.get_yaxis().set_visible(False)
 
         if len(lat_str) > 10:
-            r = types.InlineQueryResultArticle('1', 'Result1',
+            r = types.InlineQueryResultArticle('1', 'Ошибка, выражение слишком длинное.',
                                                types.InputTextMessageContent("Ошибка, выражение слишком длинное."))
             bot.answer_inline_query(inline_query.id, [r])
+            plt.close()
             return
 
         for id, lat in enumerate(lat_str):
