@@ -211,10 +211,11 @@ def query_text(inline_query):
         lat_str, size, error = parse_command(tex_command)
 
         if len(error) != 0:
+            plt.close()
+            plt.clf()
             r = types.InlineQueryResultArticle('1', 'Ошибка в конвертации',
                                                types.InputTextMessageContent("Ошибка в конвертации."))
             bot.answer_inline_query(inline_query.id, [r])
-            plt.close()
             return
 
         fig = plt.gca(frame_on=False)
@@ -222,10 +223,11 @@ def query_text(inline_query):
         fig.axes.get_yaxis().set_visible(False)
 
         if len(lat_str) > 10:
+            plt.close()
+            plt.clf()
             r = types.InlineQueryResultArticle('1', 'Ошибка, выражение слишком длинное.',
                                                types.InputTextMessageContent("Ошибка, выражение слишком длинное."))
             bot.answer_inline_query(inline_query.id, [r])
-            plt.close()
             return
 
         for id, lat in enumerate(lat_str):
@@ -236,14 +238,17 @@ def query_text(inline_query):
                 plt.text(hor_pos, vert_pos, lat, fontsize=size, horizontalalignment='center',
                          verticalalignment='center')
 
-        plt.savefig('converted.png')
+        filename = 'converted' + str(inline_query.id) + '.png'
+        plt.savefig(filename)
+        plt.clf()
         plt.close()
-        photo_id = bot.send_photo('267362684', open('converted.png', 'rb')).photo[0].file_id
+        photo_id = bot.send_photo('267362684', open(filename, 'rb')).photo[0].file_id
         r = types.InlineQueryResultCachedPhoto(id=0, photo_file_id=photo_id)
 
         bot.answer_inline_query(inline_query.id, [r], cache_time=1)
     except Exception as e:
         print(e)
+        plt.clf()
         plt.close()
 
 
