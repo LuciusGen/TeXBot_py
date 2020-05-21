@@ -94,8 +94,8 @@ def send_text(message):
         bot.send_message(message.chat.id, Math.math_ans, reply_markup=mth.start_kb_for_high_school())
 
     if message.text == '💰Помощь проекту':
-        bot.send_message(message.chat.id, Answers.url_donate_path)
-        bot.send_message(message.chat.id, Answers.url_bit_coin)
+        bot.send_message(message.chat.id, Answers.url_donate_path, disable_web_page_preview=True)
+        bot.send_message(message.chat.id, Answers.url_bit_coin, disable_web_page_preview=True)
         bot.send_message(message.chat.id, "Для доната в btc используйте счет Bitcoin кошелька: "
                          + Answers.bit_coin_bill)
 
