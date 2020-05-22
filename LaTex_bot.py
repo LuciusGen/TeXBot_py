@@ -37,7 +37,7 @@ def start_message(message):
 @bot.message_handler(commands=['help'])
 def start_message(message):
     """Answer for /help command"""
-    bot.send_message(message.chat.id, Answers.reference_ans)
+    bot.send_message(message.chat.id, Answers.reference_ans, parse_mode='Markdown')
 
 
 @bot.message_handler(regexp=r"^\/tex .+")
@@ -113,7 +113,7 @@ def send_text(message):
         bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + Answers.url_team_leader)
 
     if message.text == '❔Справка':
-        bot.send_message(message.chat.id, Answers.reference_ans)
+        bot.send_message(message.chat.id, Answers.reference_ans, parse_mode='Markdown')
 
 
 #  check that the inline button for the theme worked
