@@ -37,7 +37,7 @@ def start_message(message):
 @bot.message_handler(commands=['help'])
 def start_message(message):
     """Answer for /help command"""
-    bot.send_message(message.chat.id, Answers.reference_ans)
+    bot.send_message(message.chat.id, Answers.reference_ans, parse_mode='Markdown')
 
 
 @bot.message_handler(regexp=r"^\/tex .+")
@@ -104,8 +104,8 @@ def send_text(message):
         bot.send_message(message.chat.id, Math.math_ans, reply_markup=mth.start_kb_for_high_school())
 
     if message.text == '💰Помощь проекту':
-        bot.send_message(message.chat.id, Answers.url_donate_path)
-        bot.send_message(message.chat.id, Answers.url_bit_coin)
+        bot.send_message(message.chat.id, Answers.url_donate_path, disable_web_page_preview=True)
+        bot.send_message(message.chat.id, Answers.url_bit_coin, disable_web_page_preview=True)
         bot.send_message(message.chat.id, "Для доната в btc используйте счет Bitcoin кошелька: "
                          + Answers.bit_coin_bill)
 
@@ -113,7 +113,7 @@ def send_text(message):
         bot.send_message(message.chat.id, "Ссылка на руководителя проекта: " + Answers.url_team_leader)
 
     if message.text == '❔Справка':
-        bot.send_message(message.chat.id, Answers.reference_ans)
+        bot.send_message(message.chat.id, Answers.reference_ans, parse_mode='Markdown')
 
 
 #  check that the inline button for the theme worked
