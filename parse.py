@@ -75,6 +75,7 @@ def cnt_fontsize(len_list):
 
 def verify_expr(expr):
     str = convert_lat(expr)
+
     fig = plt.gca(frame_on=False)
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
@@ -108,11 +109,10 @@ def func_replace(lat):
                 r"\gggtr": r"\ggg", r"\llless": r"\lll", r"\Hat": r"\hat",
                 r"\Vec": r"\vec", r"\mathstrut": "", r"\displaystyle": "",
                 r"\tfrac": r"\frac", r"\nolimits": r"\limits", r"\idotsint": r"\int\dots\int",
-                r"\mathop": "", r"\text": "", r"\lvert": "|",
-                r"\rvert": "|", r"\lVert": r"\Vert", r"\rVert": r"\Vert",
+                r"\mathop": "", r"\lvert": "|", r"\rvert": "|", r"\lVert": r"\Vert",
                 r"\bigcup": r"\cup", r"\bigl": "", r"\Bigl": "", r"\biggl": "",
                 r"\Biggl": "", r"\bigr": "", r"\Bigr": "", r"\&": "&",
-                r"\biggr": "", "\Biggr": "", r"\bigm": "",
+                r"\biggr": "", "\Biggr": "", r"\bigm": "", r"\rVert": r"\Vert",
                 "\Bigm": "", r"\biggm": "", r"\Biggm": "", r"\nolimits": "",
                 r"\big": "", r"\Big": "", r"\bigg": "", r"\limits": "",
                 r"\Bigg": "", r"\gets": r"\leftarrow", r"\mod": r"\quad mod \quad",
@@ -159,6 +159,8 @@ def cnt_symb_len(expr, pos, cnt, indiv_index):
     elif expr[pos] == '{':
         text_len, pos, error = find_brac_expr(expr, pos, indiv_index)
         cnt += text_len
+    elif expr[pos] == '}':
+        error = "Ошибка: пропущена открывающая скобка }"
     else:
         if not expr[pos].isalpha():
             if not verify_expr(expr[pos]):
@@ -219,6 +221,7 @@ def find_brac_expr(expr, pos, indiv_index):
 
 def cnt_index_val(expr, pos, indiv_index):
     error = ""
+    index_len = 0
     expr_len = len(expr)
     pos += 1
 
@@ -234,10 +237,13 @@ def cnt_index_val(expr, pos, indiv_index):
 
     if expr[pos] == "{":
         index_len, pos, error = find_brac_expr(expr, pos, indiv_index)
-    elif expr[pos] == '^' or expr[pos] == '_' or is_func(expr[pos]):
+    elif expr[pos] == "}":
         error = r"Ошибка: отсутствует значение индекса"
         return 0, pos, error
-    else:
+    elif expr[pos] == '^' or expr[pos] == '_':
+        error = r"Ошибка: отсутствует значение индекса"
+        return 0, pos, error
+    elif not is_func(expr[pos]):
         index_len = 1
         pos += 1
 
@@ -371,6 +377,10 @@ def cnt_func_len(expr, pos, indiv_index):
         if pos != expr_len:
             if expr[pos] == '{':
                 arg_len, pos, error = find_brac_expr(expr, pos, indiv_index)
+
+                if len(error) != 0:
+                    return 0, pos, error
+
             elif expr[pos] != '_' and expr[pos] != '^' and not is_func(expr[pos]):
                 pos += 1
 
@@ -396,7 +406,10 @@ def pos_in_indiv_index(cur_pos, indiv_index):
 
 
 def split_expr(expr, pos, indiv_index):
-    separ_expr_list = ["+", "-", "*", "/", "=", "<", ">", ",", r"\approx", r"equiv", r"\geq", r"\leq"]
+    if len(expr) == pos:
+        return expr, ""
+
+    separ_expr_list = ["+", "-", "*", "/", "=", "<", ">", ",", r"\approx", r"equiv", r"\geq", r"\leq", r"\cdot"]
     last_symb = 0
     separ_pos = 0
 
@@ -455,9 +468,10 @@ def parse_expr(expr, cur_len):
             max_len = 40
 
         if pos == len(expr):
-            str = convert_lat(expr)
-            expr_list.append(str)
-            expr_len.append(cnt)
+            if len(expr) != 0:
+                str = convert_lat(expr)
+                expr_list.append(str)
+                expr_len.append(cnt)
             break
 
     return expr_list, expr_len, error
